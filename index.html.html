@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Học Tập Tương Tác - Hóa 12</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #818cf8;
+            --secondary: #c084fc;
+            --bg: #f3f4f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --success: #10b981;
+            --danger: #ef4444;
+            --radius: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 850px;
+            width: 100%;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow);
+            border-top: 5px solid var(--primary);
+            transition: transform 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-card {
+            text-align: center;
+            background: linear-gradient(135deg, #2563eb, #4f46e5, #9333ea);
+            color: white;
+            border-top: none;
+        }
+
+        .header-card h1 { margin: 0 0 10px 0; font-size: 2rem; text-transform: uppercase; }
+        .header-card h2 { margin: 0 0 15px 0; font-size: 1.4rem; font-weight: 500; opacity: 0.9; }
+        
+        .student-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .student-info input {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        h3 {
+            color: var(--primary);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        /* Inputs & Options */
+        input[type="text"], select {
+            padding: 10px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: 0.3s;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        input[type="text"]:focus, select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .question {
+            margin-bottom: 20px;
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+
+        .question-text { font-weight: 600; margin-top: 0; margin-bottom: 15px; font-size: 1.05rem; }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 8px;
+            background: #fff;
+            border: 1.5px solid #e5e7eb;
+            transition: 0.2s;
+        }
+        
+        .options label:hover { background: #f3f4f6; }
+        .options input[type="radio"] { margin-right: 12px; transform: scale(1.2); }
+
+        /* Grid Layouts */
+        .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .matching-grid { display: grid; grid-template-columns: 1fr 100px 1fr; gap: 15px; align-items: center; margin-bottom: 12px; background: #fff; padding: 10px; border-radius: 8px; border: 1px solid #e5e7eb;}
+        
+        /* Drag & Drop */
+        .drag-pool {
+            display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+            padding: 15px; background: #e0e7ff; border-radius: 12px; min-height: 60px;
+        }
+        
+        .drag-item {
+            padding: 10px 20px; background: var(--primary); color: white;
+            border-radius: 8px; cursor: grab; user-select: none; font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.2s;
+        }
+        
+        .drag-item:active { cursor: grabbing; transform: scale(0.95); }
+        .drag-item.locked { background: var(--success); cursor: default; box-shadow: none; transform: none; }
+        
+        .drop-row { display: flex; gap: 15px; align-items: center; margin-bottom: 12px; background: #fff; padding: 12px; border-radius: 8px; border: 1px solid #e5e7eb;}
+        .drop-desc { flex: 1; font-weight: 500; }
+        .drop-zone {
+            width: 160px; min-height: 45px; border: 2px dashed #9ca3af;
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            background: #f9fafb; transition: 0.3s;
+        }
+        .drop-zone.dragover { background: #dbeafe; border-color: var(--primary); }
+
+        /* Validation Colors */
+        .correct-box { border-color: var(--success) !important; background-color: #ecfdf5 !important; }
+        .wrong-box { border-color: var(--danger) !important; background-color: #fef2f2 !important; }
+        .correct-text { color: var(--success); font-weight: bold; margin-left: 10px;}
+        .wrong-text { color: var(--danger); font-weight: bold; margin-left: 10px;}
+
+        /* Buttons & Footer */
+        .btn-group { display: flex; gap: 15px; margin-top: 30px; }
+        .btn {
+            flex: 1; border: none; padding: 16px; font-size: 16px; border-radius: 30px;
+            cursor: pointer; font-weight: bold; text-transform: uppercase;
+            transition: 0.3s; color: white; box-shadow: var(--shadow);
+            font-family: 'Roboto', sans-serif;
+        }
+        .btn-submit { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-submit:hover { background: linear-gradient(135deg, #059669, #047857); transform: translateY(-2px); }
+        .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
+        
+        .btn-admin { background: #4b5563; padding: 10px 20px; border-radius: 8px; margin-top: 20px; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: white; border: none; font-weight: bold;}
+        .btn-admin:hover { background: #374151; }
+
+        #score-board {
+            display: none; text-align: center; padding: 25px; margin-top: 20px;
+            background: #ecfdf5; border: 2px solid var(--success); border-radius: 16px;
+            font-size: 1.8rem; font-weight: bold; color: #065f46;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .summary-card { background: linear-gradient(135deg, #fef08a, #fde047); color: #854d0e; border-top: none; }
+        .summary-card h3 { color: #713f12; border-bottom-color: #facc15; }
+
+        /* Admin Modal */
+        #admin-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); z-index: 1000; justify-content: center; align-items: center;
+        }
+        .admin-content {
+            background: white; padding: 30px; border-radius: 16px; max-width: 600px; width: 90%;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);
+        }
+        .admin-content h2 { margin-top: 0; color: var(--primary); border-bottom: 2px solid #e5e7eb; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 5px; }
+        .form-group input, .form-group select { width: 100%; }
+        .config-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px;}
+        .btn-save { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 20px; font-size: 16px;}
+
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8); } 100% { opacity: 1; transform: scale(1); } }
+
+        @media(max-width: 600px) {
+            .student-info, .tf-grid { grid-template-columns: 1fr; }
+            .matching-grid { grid-template-columns: 1fr; text-align: center; }
+            .drop-row { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="app-container"></div>
+        <div style="text-align: right;">
+            <button class="btn-admin" onclick="openAdmin()">⚙️ QUẢN TRỊ</button>
+        </div>
+    </div>
+
+    <!-- Admin Modal -->
+    <div id="admin-modal">
+        <div class="admin-content">
+            <h2>⚙️ Cài Đặt Phiếu Học Tập</h2>
+            <div class="form-group">
+                <label>Tên bài học</label>
+                <input type="text" id="admin-title" value="ÔN TẬP CHƯƠNG 2: CARBOHYDRATE">
+            </div>
+            <div class="form-group">
+                <label>Môn học</label>
+                <input type="text" id="admin-subject" value="HÓA HỌC">
+            </div>
+            <div class="form-group">
+                <label>Khối lớp</label>
+                <input type="text" id="admin-class" value="12">
+            </div>
+            <div class="form-group">
+                <label>Tổng điểm toàn phiếu</label>
+                <input type="number" id="admin-total" value="10" step="0.5">
+            </div>
+            
+            <h3 style="font-size: 1.1rem; margin-top: 20px;">Cấu hình Điểm & Hiển thị</h3>
+            <div class="config-grid">
+                <div>
+                    <label><input type="checkbox" id="toggle-mcq" checked> Trắc nghiệm</label>
+                    <input type="number" id="score-mcq" placeholder="Điểm tối đa" value="2.5" step="0.25">
+                </div>
+                <div>
+                    <label><input type="checkbox" id="toggle-blank" checked> Điền khuyết</label>
+                    <input type="number" id="score-blank" placeholder="Điểm tối đa" value="2" step="0.25">
+                </div>
+                <div>
+                    <label><input type="checkbox" id="toggle-tf" checked> Đúng / Sai</label>
+                    <input type="number" id="score-tf" placeholder="Điểm tối đa" value="2" step="0.25">
+                </div>
+                <div>
+                    <label><input type="checkbox" id="toggle-match" checked> Nối cột</label>
+                    <input type="number" id="score-match" placeholder="Điểm tối đa" value="1.5" step="0.25">
+                </div>
+                <div>
+                    <label><input type="checkbox" id="toggle-drag" checked> Kéo thả</label>
+                    <input type="number" id="score-drag" placeholder="Điểm tối đa" value="2" step="0.25">
+                </div>
+            </div>
+            <button class="btn-save" onclick="saveAdmin()">LƯU CẤU HÌNH</button>
+            <button class="btn-save" style="background: #9ca3af; margin-top: 10px;" onclick="document.getElementById('admin-modal').style.display='none'">HỦY</button>
+        </div>
+    </div>
+
+    <!-- DỮ LIỆU & LOGIC -->
+    <script>
+        // 1. DATA GỐC
+        let defaultData = {
+            meta: {
+                title: "ÔN TẬP CHƯƠNG 2: CARBOHYDRATE",
+                subject: "HÓA HỌC",
+                grade: "12",
+                totalScore: 10
+            },
+            config: {
+                mcq: { active: true, score: 2.5 },
+                blank: { active: true, score: 2 },
+                tf: { active: true, score: 2 },
+                match: { active: true, score: 1.5 },
+                drag: { active: true, score: 2 }
+            },
+            objectives: [
+                "Hệ thống hóa kiến thức phân loại, cấu trúc và tính chất hóa học của Carbohydrate.",
+                "Phân biệt đặc điểm của Monosaccharide, Disaccharide và Polysaccharide.",
+                "Rèn luyện kỹ năng giải quyết bài tập lý thuyết Hóa học 12."
+            ],
+            mcq: [
+                { id: "q1", q: "Câu 1: Chất nào sau đây thuộc loại monosaccharide?", opts: [{v:"A", t:"A. Saccharose"}, {v:"B", t:"B. Glucose"}, {v:"C", t:"C. Tinh bột"}, {v:"D", t:"D. Cellulose"}], a: "B" },
+                { id: "q2", q: "Câu 2: Phản ứng hóa học đặc trưng dùng để nhận biết hồ tinh bột là?", opts: [{v:"A", t:"A. Phản ứng tráng bạc"}, {v:"B", t:"B. Phản ứng với dung dịch Iot"}, {v:"C", t:"C. Phản ứng thủy phân"}, {v:"D", t:"D. Tác dụng với Cu(OH)2"}], a: "B" },
+                { id: "q3", q: "Câu 3: Carbohydrate nào sau đây KHÔNG tham gia phản ứng thủy phân?", opts: [{v:"A", t:"A. Fructose"}, {v:"B", t:"B. Saccharose"}, {v:"C", t:"C. Maltose"}, {v:"D", t:"D. Cellulose"}], a: "A" },
+                { id: "q4", q: "Câu 4: Loại tơ nào sau đây được sản xuất từ nguyên liệu cellulose?", opts: [{v:"A", t:"A. Tơ nilon-6,6"}, {v:"B", t:"B. Tơ capron"}, {v:"C", t:"C. Tơ visco"}, {v:"D", t:"D. Tơ tằm"}], a: "C" },
+                { id: "q5", q: "Câu 5: Trong công nghiệp thực phẩm, saccharose được sử dụng phổ biến làm nguyên liệu để làm gì?", opts: [{v:"A", t:"A. Sản xuất tơ nhân tạo"}, {v:"B", t:"B. Chế tạo thuốc súng"}, {v:"C", t:"C. Pha chế thuốc, làm bánh kẹo"}, {v:"D", t:"D. Tráng gương"}], a: "C" }
+            ],
+            tf: [
+                { id: "tf1", q: "1. Saccharose có khả năng tham gia phản ứng tráng bạc do có nhóm -CHO.", a: "false" },
+                { id: "tf2", q: "2. Glucose và Fructose là đồng phân của nhau, đều có công thức phân tử C6H12O6.", a: "true" },
+                { id: "tf3", q: "3. Tinh bột và cellulose là đồng phân của nhau vì đều có công thức (C6H10O5)n.", a: "false" }
+            ],
+            fillBlank: [
+                { id: "dk1", before: "1. Tinh bột được cấu tạo từ nhiều gốc ", after: " liên kết với nhau.", ans: ["alpha-glucose", "α-glucose", "glucose", "glucozo", "glucozơ"] },
+                { id: "dk2", before: "2. Phản ứng đặc trưng dùng để nhận biết glucose và fructose là phản ứng ", after: ".", ans: ["tráng bạc", "tráng gương"] }
+            ],
+            matching: {
+                left: [ {id:"m1", t:"1. Glucose", a:"b"}, {id:"m2", t:"2. Saccharose", a:"d"}, {id:"m3", t:"3. Tinh bột", a:"a"}, {id:"m4", t:"4. Cellulose", a:"c"} ],
+                right: [ {v:"a", t:"a. Thành phần chính của gạo, ngô, khoai"}, {v:"b", t:"b. Còn gọi là đường nho"}, {v:"c", t:"c. Thành phần chính của bông, gỗ"}, {v:"d", t:"d. Còn gọi là đường mía, đường phèn"} ]
+            },
+            dragDrop: {
+                items: [ {id:"glu", t:"Glucose"}, {id:"cel", t:"Cellulose"}, {id:"sac", t:"Saccharose"} ],
+                zones: [
+                    {m:"glu", d:"Dùng làm thuốc tăng lực cho người bệnh, tráng gương, tráng ruột phích."},
+                    {m:"cel", d:"Nguyên liệu sản xuất tơ nhân tạo (visco, acetate), chế tạo thuốc súng không khói."},
+                    {m:"sac", d:"Dùng phổ biến trong công nghiệp thực phẩm, không có tính khử."}
+                ]
+            },
+            summary: [
+                "<b>Monosaccharide:</b> Glucose, Fructose (Không bị thủy phân).",
+                "<b>Disaccharide:</b> Saccharose, Maltose (Thủy phân sinh ra 2 monosaccharide).",
+                "<b>Polysaccharide:</b> Tinh bột, Cellulose (Thủy phân sinh ra nhiều monosaccharide).",
+                "<b>Nhận biết:</b> Glucose tráng bạc; Tinh bột + I2 → Xanh tím."
+            ]
+        };
+
+        let quizData = JSON.parse(localStorage.getItem('quizData_Carbo12')) || defaultData;
+
+        // 2. RENDER GIAO DIỆN
+        function renderApp() {
+            const container = document.getElementById('app-container');
+            
+            let html = `
+                <div class="card header-card">
+                    <h2>PHIẾU HỌC TẬP TƯƠNG TÁC MÔN ${quizData.meta.subject} ${quizData.meta.grade}</h2>
+                    <h1>${quizData.meta.title}</h1>
+                    <div class="student-info">
+                        <input type="text" id="studentName" placeholder="Họ và tên học sinh..." required>
+                        <input type="text" id="studentClass" placeholder="Lớp..." required>
+                    </div>
+                </div>
+            `;
+
+            html += `<div class="card"><h3>🎯 MỤC TIÊU BÀI HỌC</h3><ul style="color: var(--text-muted); font-weight: 500;">`;
+            quizData.objectives.forEach(obj => html += `<li>${obj}</li>`);
+            html += `<li><b>Lưu ý:</b> Học sinh thao tác trực tiếp, chọn đáp án, gõ từ khóa và kéo thả. Bấm NỘP BÀI khi hoàn thành.</li></ul></div>`;
+
+            html += `<form id="quizForm">`;
+
+            if (quizData.config.mcq.active && quizData.mcq.length > 0) {
+                html += `<div class="card" id="sec-mcq"><h3>📝 KHU VỰC 1: TRẮC NGHIỆM NHANH</h3>`;
+                quizData.mcq.forEach(q => {
+                    html += `<div class="question" id="box-${q.id}">
+                        <p class="question-text">${q.q}</p>
+                        <div class="options">
+                            ${q.opts.map(opt => `<label id="lbl-${q.id}-${opt.v}"><input type="radio" name="${q.id}" value="${opt.v}"> ${opt.t}</label>`).join('')}
+                        </div>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            if (quizData.config.blank.active && quizData.fillBlank.length > 0) {
+                html += `<div class="card" id="sec-blank"><h3>✍️ KHU VỰC 2: ĐIỀN KHUYẾT</h3>`;
+                quizData.fillBlank.forEach(q => {
+                    html += `<div class="question" id="box-${q.id}">
+                        <p class="question-text">${q.before} <input type="text" id="${q.id}" style="width:180px; display:inline-block;" placeholder="Nhập từ khóa..."> ${q.after} <span id="res-${q.id}"></span></p>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            if (quizData.config.tf.active && quizData.tf.length > 0) {
+                html += `<div class="card" id="sec-tf"><h3>✅ KHU VỰC 3: ĐÚNG / SAI</h3>`;
+                quizData.tf.forEach(q => {
+                    html += `<div class="question" id="box-${q.id}">
+                        <p class="question-text">${q.q}</p>
+                        <div class="tf-grid">
+                            <label id="lbl-${q.id}-true"><input type="radio" name="${q.id}" value="true"> ĐÚNG</label>
+                            <label id="lbl-${q.id}-false"><input type="radio" name="${q.id}" value="false"> SAI</label>
+                        </div>
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+
+            if (quizData.config.match.active && quizData.matching.left.length > 0) {
+                html += `<div class="card" id="sec-match"><h3>🔗 KHU VỰC 4: NỐI CỘT</h3><div style="background: #f9fafb; padding: 15px; border-radius: 12px;">`;
+                let optionsHtml = `<option value="">--Chọn--</option>` + quizData.matching.right.map(r => `<option value="${r.v}">${r.v}</option>`).join('');
+                quizData.matching.left.forEach((l, i) => {
+                    const r = quizData.matching.right[i];
+                    html += `<div class="matching-grid" id="box-${l.id}">
+                        <div style="font-weight: 500;">${l.t}</div>
+                        <div><select id="${l.id}">${optionsHtml}</select><span id="res-${l.id}"></span></div>
+                        <div>${r ? r.t : ''}</div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            }
+
+            if (quizData.config.drag.active && quizData.dragDrop.items.length > 0) {
+                html += `<div class="card" id="sec-drag">
+                    <h3>🧩 KHU VỰC 5: KÉO THẢ KHÁI NIỆM</h3>
+                    <p style="color: var(--text-muted); font-style: italic;">Kéo các ô chất màu xanh thả vào vị trí nét đứt tương ứng với tính chất/ứng dụng.</p>
+                    <div class="drag-pool" id="dragPool">
+                        ${quizData.dragDrop.items.map(item => `<div class="drag-item" draggable="true" data-id="${item.id}">${item.t}</div>`).join('')}
+                    </div>
+                    ${quizData.dragDrop.zones.map((zone, i) => `
+                    <div class="drop-row">
+                        <div class="drop-desc">${i+1}. ${zone.d}</div>
+                        <div class="drop-zone" data-match="${zone.m}"></div>
+                    </div>`).join('')}
+                </div>`;
+            }
+
+            html += `
+                <div class="card summary-card">
+                    <h3>💡 GHI NHỚ SIÊU NHANH</h3>
+                    <ul style="line-height: 1.8;">
+                        ${quizData.summary.map(s => `<li>${s}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div id="score-board">ĐIỂM CỦA EM: <span id="score-text">0.00 / ${parseFloat(quizData.meta.totalScore).toFixed(2)}</span></div>
+                
+                <div class="btn-group">
+                    <button type="button" class="btn" style="background: #ef4444;" onclick="location.reload()">🔄 LÀM LẠI</button>
+                    <button type="button" class="btn btn-submit" onclick="submitForm()">🚀 NỘP BÀI & CHẤM ĐIỂM</button>
+                </div>
+            </form>`;
+
+            container.innerHTML = html;
+            initDragAndDrop();
+        }
+
+        // 3. LOGIC KÉO THẢ
+        function initDragAndDrop() {
+            let draggedElement = null;
+            const dragItems = document.querySelectorAll('.drag-item');
+            const dropZones = document.querySelectorAll('.drop-zone');
+
+            dragItems.forEach(item => {
+                item.addEventListener('dragstart', (e) => {
+                    if (item.classList.contains('locked')) { e.preventDefault(); return; }
+                    draggedElement = item;
+                    setTimeout(() => item.style.opacity = '0.5', 0);
+                });
+                item.addEventListener('dragend', () => {
+                    setTimeout(() => item.style.opacity = '1', 0);
+                    draggedElement = null;
+                });
+            });
+
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    if(!zone.classList.contains('correct-drop')) zone.classList.add('dragover');
+                });
+                zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+                zone.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zone.classList.remove('dragover');
+                    if (draggedElement && !zone.hasChildNodes()) {
+                        zone.appendChild(draggedElement);
+                        draggedElement.classList.add('locked');
+                        draggedElement.draggable = false;
+                        zone.classList.add('filled-drop');
+                    }
+                });
+            });
+        }
+
+        // 4. LOGIC CHẤM ĐIỂM VÀ TÍNH TOÁN
+        function submitForm() {
+            const hoTen = document.getElementById('studentName').value.trim();
+            const lop = document.getElementById('studentClass').value.trim();
+
+            if(!hoTen || !lop) {
+                alert("Vui lòng điền đầy đủ Họ tên và Lớp trước khi nộp bài!");
+                return;
+            }
+
+            let totalPoints = 0;
+            let totalCorrect = 0;
+            let totalWrong = 0;
+            let totalUnanswered = 0;
+            let totalQuestions = 0;
+            
+            function gradeSection(active, items, type) {
+                if (!active || !items) return;
+                
+                let secCorrect = 0;
+                let secWrong = 0;
+                let secUnanswered = 0;
+                let secTotal = type === 'drag' ? quizData.dragDrop.zones.length : items.length;
+                let maxScore = parseFloat(quizData.config[type].score);
+
+                // MC & TF
+                if (type === 'mcq' || type === 'tf') {
+                    items.forEach(q => {
+                        const checked = document.querySelector(`input[name="${q.id}"]:checked`);
+                        const box = document.getElementById(`box-${q.id}`);
+                        box.classList.remove('correct-box', 'wrong-box');
+                        document.querySelectorAll(`#box-${q.id} label`).forEach(l => l.style.borderColor = "#e5e7eb");
+
+                        if (checked) {
+                            if (checked.value === q.a) {
+                                secCorrect++;
+                                box.classList.add('correct-box');
+                                document.getElementById(`lbl-${q.id}-${checked.value}`).classList.add('correct-box');
+                                document.getElementById(`lbl-${q.id}-${checked.value}`).innerHTML += ' <span style="color:var(--success)">✓</span>';
+                            } else {
+                                secWrong++;
+                                box.classList.add('wrong-box');
+                                document.getElementById(`lbl-${q.id}-${checked.value}`).classList.add('wrong-box');
+                                document.getElementById(`lbl-${q.id}-${checked.value}`).innerHTML += ' <span style="color:var(--danger)">✗</span>';
+                                document.getElementById(`lbl-${q.id}-${q.a}`).style.borderColor = "var(--success)";
+                                document.getElementById(`lbl-${q.id}-${q.a}`).style.borderWidth = "2px";
+                            }
+                        } else {
+                            secUnanswered++;
+                            box.classList.add('wrong-box');
+                            document.getElementById(`lbl-${q.id}-${q.a}`).style.borderColor = "var(--success)";
+                        }
+                    });
+                }
+                
+                // Fill in Blank
+                if (type === 'blank') {
+                    items.forEach(q => {
+                        const input = document.getElementById(q.id);
+                        const val = input.value.trim().toLowerCase();
+                        const box = document.getElementById(`box-${q.id}`);
+                        const res = document.getElementById(`res-${q.id}`);
+                        box.classList.remove('correct-box', 'wrong-box');
+                        
+                        if (val === "") {
+                            secUnanswered++;
+                            box.classList.add('wrong-box');
+                            input.style.borderColor = "var(--danger)";
+                            res.innerHTML = `<span class="wrong-text">✗ Chưa làm (ĐA: ${q.ans[0]})</span>`;
+                        } else if (q.ans.includes(val)) {
+                            secCorrect++;
+                            box.classList.add('correct-box');
+                            input.style.borderColor = "var(--success)";
+                            res.innerHTML = '<span class="correct-text">✓ Đúng</span>';
+                        } else {
+                            secWrong++;
+                            box.classList.add('wrong-box');
+                            input.style.borderColor = "var(--danger)";
+                            res.innerHTML = `<span class="wrong-text">✗ Sai (ĐA: ${q.ans[0]})</span>`;
+                        }
+                    });
+                }
+
+                // Matching
+                if (type === 'match') {
+                    items.forEach(q => {
+                        const val = document.getElementById(q.id).value;
+                        const box = document.getElementById(`box-${q.id}`);
+                        const res = document.getElementById(`res-${q.id}`);
+                        box.classList.remove('correct-box', 'wrong-box');
+
+                        if (val === "") {
+                            secUnanswered++;
+                            box.classList.add('wrong-box');
+                            res.innerHTML = `<span class="wrong-text">✗ Chưa làm (ĐA: ${q.a})</span>`;
+                        } else if (val === q.a) {
+                            secCorrect++;
+                            box.classList.add('correct-box');
+                            res.innerHTML = '<span class="correct-text">✓</span>';
+                        } else {
+                            secWrong++;
+                            box.classList.add('wrong-box');
+                            res.innerHTML = `<span class="wrong-text">✗ (ĐA: ${q.a})</span>`;
+                        }
+                    });
+                }
+
+                // Drag Drop
+                if (type === 'drag') {
+                    document.querySelectorAll('.drop-zone').forEach(zone => {
+                        zone.style.borderColor = "#9ca3af";
+                        zone.style.backgroundColor = "#f9fafb";
+                        
+                        if (!zone.hasChildNodes()) {
+                            secUnanswered++;
+                            zone.style.borderColor = "var(--danger)";
+                        } else {
+                            const expected = zone.getAttribute('data-match');
+                            const actual = zone.firstChild.getAttribute('data-id');
+                            if (expected === actual) {
+                                secCorrect++;
+                                zone.style.borderColor = "var(--success)";
+                                zone.style.backgroundColor = "#ecfdf5";
+                            } else {
+                                secWrong++;
+                                zone.style.borderColor = "var(--danger)";
+                                zone.style.backgroundColor = "#fef2f2";
+                            }
+                        }
+                    });
+                }
+
+                totalQuestions += secTotal;
+                totalCorrect += secCorrect;
+                totalWrong += secWrong;
+                totalUnanswered += secUnanswered;
+                if(secTotal > 0) {
+                    totalPoints += (secCorrect / secTotal) * maxScore;
+                }
+            }
+
+            gradeSection(quizData.config.mcq.active, quizData.mcq, 'mcq');
+            gradeSection(quizData.config.blank.active, quizData.fillBlank, 'blank');
+            gradeSection(quizData.config.tf.active, quizData.tf, 'tf');
+            gradeSection(quizData.config.match.active, quizData.matching.left, 'match');
+            gradeSection(quizData.config.drag.active, quizData.dragDrop.items, 'drag');
+
+            const finalScore = totalPoints.toFixed(2);
+
+            // Display Score
+            const board = document.getElementById('score-board');
+            board.style.display = 'block';
+            document.getElementById('score-text').innerText = `${finalScore} / ${parseFloat(quizData.meta.totalScore).toFixed(2)}`;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+
+            // 5. GỬI DỮ LIỆU LÊN GOOGLE SHEETS
+            const webAppUrl = "https://script.google.com/macros/s/AKfycbx0Gcm90G8Y4KGwwWl6CSwgDMczUJekU-dB5_xqD4B8_vG43T6ios0IOVhYt6Y2ycOzHw/exec";
+            
+            const payload = {
+                hoTen: hoTen,
+                lop: lop,
+                diem: finalScore,
+                cauDung: totalCorrect,
+                cauSai: totalWrong,
+                cauChuaLam: totalUnanswered,
+                tongCau: totalQuestions
+            };
+
+            const btnSubmit = document.querySelector('.btn-submit');
+            const originalBtnText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = "⏳ ĐANG GỬI DỮ LIỆU...";
+            btnSubmit.disabled = true;
+
+            fetch(webAppUrl, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" }, 
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "success") {
+                    alert("🎉 Hoàn thành! Điểm của em: " + finalScore + "\nĐã gửi kết quả thành công cho Giáo viên.");
+                } else {
+                    alert("Lưu điểm bị lỗi: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Lỗi:", error);
+                alert("Mạng yếu hoặc có lỗi khi gửi điểm! Em vui lòng chụp màn hình điểm số gửi cho Giáo viên nhé.");
+            })
+            .finally(() => {
+                btnSubmit.innerHTML = originalBtnText;
+                btnSubmit.disabled = false;
+            });
+        }
+
+        // 6. QUẢN TRỊ ADMIN
+        function openAdmin() {
+            const pwd = prompt("Nhập mật khẩu quản trị (Gợi ý: 1230):");
+            if (pwd === "1230") {
+                document.getElementById('admin-modal').style.display = 'flex';
+                document.getElementById('admin-title').value = quizData.meta.title;
+                document.getElementById('admin-subject').value = quizData.meta.subject;
+                document.getElementById('admin-class').value = quizData.meta.grade;
+                document.getElementById('admin-total').value = quizData.meta.totalScore;
+
+                ['mcq', 'blank', 'tf', 'match', 'drag'].forEach(key => {
+                    document.getElementById(`toggle-${key}`).checked = quizData.config[key].active;
+                    document.getElementById(`score-${key}`).value = quizData.config[key].score;
+                });
+            } else if (pwd !== null) {
+                alert("Sai mật khẩu!");
+            }
+        }
+
+        function saveAdmin() {
+            let totalTarget = parseFloat(document.getElementById('admin-total').value);
+            let keys = ['mcq', 'blank', 'tf', 'match', 'drag'];
+            let currentSum = 0;
+
+            keys.forEach(k => {
+                if(document.getElementById(`toggle-${k}`).checked) {
+                    currentSum += parseFloat(document.getElementById(`score-${k}`).value || 0);
+                }
+            });
+
+            if (Math.abs(currentSum - totalTarget) > 0.01) {
+                alert(`Cảnh báo: Tổng điểm các phần đang bật (${currentSum}) không bằng tổng điểm toàn bài (${totalTarget}). Vui lòng điều chỉnh lại!`);
+                return;
+            }
+
+            quizData.meta.title = document.getElementById('admin-title').value;
+            quizData.meta.subject = document.getElementById('admin-subject').value;
+            quizData.meta.grade = document.getElementById('admin-class').value;
+            quizData.meta.totalScore = totalTarget;
+
+            keys.forEach(k => {
+                quizData.config[k].active = document.getElementById(`toggle-${k}`).checked;
+                quizData.config[k].score = parseFloat(document.getElementById(`score-${k}`).value);
+            });
+
+            localStorage.setItem('quizData_Carbo12', JSON.stringify(quizData));
+            document.getElementById('admin-modal').style.display = 'none';
+            alert("Đã lưu cấu hình. Đang tải lại phiếu học tập...");
+            renderApp();
+        }
+
+        // Init
+        window.onload = renderApp;
+    </script>
+</body>
+</html>
